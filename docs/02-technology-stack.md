@@ -70,7 +70,9 @@ The repository is a Swift package:
 - `SimpleTile`: executable with the AX code, event tap, AppKit UI, and app lifecycle.
 - `SimpleTileCoreTests`: tests for the core.
 
-`scripts/bundle.sh` runs `swift build -c release`, assembles `SimpleTile.app` with an `Info.plist` (`LSUIElement = YES` for no Dock icon, per APP-1), and signs it. `scripts/install.sh` bundles, copies the app to `~/Applications`, and relaunches it.
+`scripts/bundle.sh` runs `swift build -c release` for arm64 and x86_64, assembles `SimpleTile.app` with an `Info.plist` (`LSUIElement = YES` for no Dock icon, per APP-1) and an icon built from `Resources/AppIcon.png`, writes `$VERSION` and `$BUILD_NUMBER` into the `Info.plist`, and signs it. `scripts/package.sh` zips the app for a release. `scripts/install.sh` bundles, copies the app to `~/Applications`, and relaunches it.
+
+The Command Line Tools build both architectures in one `swift build`; Xcode is not needed.
 
 There's no Xcode project. `Package.swift` is the only build definition, it opens in Xcode and other IDEs, and it works from the command line and CI.
 

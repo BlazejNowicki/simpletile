@@ -1,18 +1,24 @@
 #!/bin/sh
-# Builds build/SimpleTile.app.
+# Builds build/SimpleTile.app for arm64 and x86_64.
+# $VERSION sets CFBundleShortVersionString (default 0.0.0-dev), $BUILD_NUMBER sets CFBundleVersion (default 1).
 # Signs with $SIMPLETILE_SIGN_IDENTITY when set. Ad-hoc signing (the default) makes macOS ask for the
 # Accessibility permission again after every rebuild; a self-signed code signing certificate avoids that.
 set -eu
 cd "$(dirname "$0")/.."
 
-swift build -c release --product SimpleTile
-bin="$(swift build -c release --show-bin-path)/SimpleTile"
+archs="--arch arm64 --arch x86_64"
+swift build -c release --product SimpleTile $archs
+bin="$(swift build -c release $archs --show-bin-path)/SimpleTile"
 
 app=build/SimpleTile.app
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS"
 cp "$bin" "$app/Contents/MacOS/SimpleTile"
 cp Resources/Info.plist "$app/Contents/Info.plist"
+/usr/libexec/PlistBuddy \
+    -c "Set :CFBundleShortVersionString ${VERSION:-0.0.0-dev}" \
+    -c "Set :CFBundleVersion ${BUILD_NUMBER:-1}" \
+    "$app/Contents/Info.plist"
 
 iconset="$(mktemp -d)/AppIcon.iconset"
 mkdir -p "$iconset" "$app/Contents/Resources"

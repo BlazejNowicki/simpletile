@@ -82,14 +82,16 @@ Verify:
 
 ## Step 5: CI
 
+Status: done 2026-11-22. Green run on `main`, red run on the closed PR #1.
+
 Who: Claude.
 
 Changes:
-- `.github/workflows/ci.yml` on push and pull request to `main`, `macos-15` runner: `swift build`, `swift test --enable-code-coverage`, coverage of `SimpleTileCore` at least 90% (read with `llvm-cov report`), `scripts/check-traceability.sh`, `swift format lint --strict`, `scripts/bundle.sh` signed ad hoc.
+- `.github/workflows/ci.yml` on push and pull request to `main`, `macos-26` runner: `swift build`, `swift test --enable-code-coverage`, `scripts/check-coverage.sh 90` (line coverage of `SimpleTileCore` from the SwiftPM coverage JSON), `scripts/check-traceability.sh`, `swift format lint --strict`, `scripts/bundle.sh` signed ad hoc.
 
 Verify:
 - `gh run watch` on the push shows the run green.
-- A pushed branch with a deliberately failing test shows the run red. Delete the branch after.
+- A draft pull request with a deliberately failing test shows the run red. Close it and delete the branch after.
 
 ## Step 6: App icon and Info.plist
 
@@ -113,6 +115,8 @@ Prompt for the image generator:
 The menu bar uses the SF Symbol `rectangle.split.2x1`. The icon only borrows the idea: Apple's SF Symbols license does not allow symbols in app icons.
 
 ## Step 7: Release build
+
+Status: done 2026-11-22, awaiting review.
 
 Who: Claude.
 

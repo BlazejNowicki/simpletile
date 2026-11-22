@@ -39,10 +39,10 @@ Plan: self-signed certificate plus quarantine removal in the cask, as AeroSpace 
 
 ## Changes to this project
 
-1. Bundle identifier: change `local.simpletile` to `io.github.blazejnowicki.simpletile` before the first release. Changing it later resets every user's Accessibility permission and login item.
-2. Version: `scripts/bundle.sh` takes the version from `$VERSION` (default `0.0.0-dev`) and writes it into `CFBundleShortVersionString`. `CFBundleVersion` gets the CI run number.
-3. Universal binary: build with `--arch arm64 --arch x86_64`, so the app runs on Intel Macs too.
-4. Packaging: `ditto -c -k --keepParent build/SimpleTile.app SimpleTile-<version>.zip`. `ditto` keeps the bundle's signature and extended attributes intact, which plain `zip` may not.
+1. Bundle identifier: `io.github.blazejnowicki.simpletile`. Changing it after the first release would reset every user's Accessibility permission and login item.
+2. Version: `scripts/bundle.sh` writes `$VERSION` (default `0.0.0-dev`) into `CFBundleShortVersionString` and `$BUILD_NUMBER` (the CI run number in releases) into `CFBundleVersion`.
+3. Universal binary: built with `--arch arm64 --arch x86_64`, so the app runs on Intel Macs too.
+4. Packaging: `scripts/package.sh` runs `ditto -c -k --keepParent build/SimpleTile.app build/SimpleTile-$VERSION.zip`. `ditto` keeps the bundle's signature and extended attributes intact, which plain `zip` may not.
 
 ## Release workflow
 
@@ -50,7 +50,7 @@ Plan: self-signed certificate plus quarantine removal in the cask, as AeroSpace 
 
 1. Check out the code on a macOS runner.
 2. Run `swift test`.
-3. Import the self-signed certificate (`.p12` and its password, stored as secrets) into a temporary keychain, then run `VERSION=${tag#v} SIMPLETILE_SIGN_IDENTITY="SimpleTile Release" scripts/bundle.sh`.
+3. Import the self-signed certificate (`.p12` and its password, stored as secrets) into a temporary keychain, then run `VERSION=${tag#v} BUILD_NUMBER=$GITHUB_RUN_NUMBER SIMPLETILE_SIGN_IDENTITY="SimpleTile Release" scripts/bundle.sh`.
 4. Zip it and compute the `sha256`.
 5. Create the GitHub release with the zip attached.
 6. Update `Casks/simpletile.rb` in the tap (version and `sha256`) and push. This needs a fine-grained token with write access to the tap repository, stored as a secret.
