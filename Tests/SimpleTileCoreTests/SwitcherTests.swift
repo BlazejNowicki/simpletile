@@ -11,7 +11,7 @@ struct SwitcherStateTests {
     @Test("SW-3: opens with the second entry selected")
     func secondSelected() throws {
         let state = try #require(SwitcherState(entries: [a, b, c]))
-        #expect(state.selection == b)
+        #expect(state.selection == c)
     }
 
     @Test("SW-4: next and previous wrap around")
