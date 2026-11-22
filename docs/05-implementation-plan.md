@@ -36,6 +36,8 @@ Verify:
 
 ## Step 2: Git and GitHub
 
+Status: done 2026-11-22. Commits use the GitHub noreply email, set in the repository config.
+
 Who: Claude, with the user approving the push.
 
 Changes:
