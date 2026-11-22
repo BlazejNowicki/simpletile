@@ -1,0 +1,73 @@
+name: Release
+
+# A v* tag builds, signs and publishes a GitHub release.
+# A manual run does the same without publishing and uploads the zip as a workflow artifact.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: swift test
+
+      - name: Import the signing certificate into a temporary keychain
+        env:
+          SIGNING_CERT_P12: ${{ secrets.SIGNING_CERT_P12 }}
+          SIGNING_CERT_PASSWORD: ${{ secrets.SIGNING_CERT_PASSWORD }}
+        run: |
+          keychain="$RUNNER_TEMP/release.keychain-db"
+          keychain_password="$(uuidgen)"
+          echo "$SIGNING_CERT_P12" | base64 --decode > "$RUNNER_TEMP/release.p12"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$RUNNER_TEMP/release.p12" -k "$keychain" -P "$SIGNING_CERT_PASSWORD" -T /usr/bin/codesign
+          rm "$RUNNER_TEMP/release.p12"
+          # Without this, codesign fails with errSecInternalComponent instead of using the key.
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+
+      - name: Version
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "VERSION=0.0.0-dryrun.$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+          fi
+
+      - name: Bundle
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+          SIMPLETILE_SIGN_IDENTITY: Simple Tile Release
+        run: scripts/bundle.sh
+
+      - name: Check the signature and architectures
+        run: |
+          codesign --verify --strict build/SimpleTile.app
+          codesign -dv --verbose=2 build/SimpleTile.app 2>&1 | grep -x 'Authority=Simple Tile Release'
+          codesign -d -r- build/SimpleTile.app
+          test "$(lipo -archs build/SimpleTile.app/Contents/MacOS/SimpleTile)" = "x86_64 arm64"
+
+      - name: Package
+        run: scripts/package.sh | tee "$RUNNER_TEMP/package.txt"
+
+      - name: Publish the release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "build/SimpleTile-$VERSION.zip" --title "$GITHUB_REF_NAME" --generate-notes
+
+      - name: Upload the zip of a dry run
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SimpleTile-${{ env.VERSION }}
+          path: build/SimpleTile-${{ env.VERSION }}.zip

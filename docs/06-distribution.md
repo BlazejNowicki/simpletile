@@ -50,7 +50,7 @@ Plan: self-signed certificate plus quarantine removal in the cask, as AeroSpace 
 
 1. Check out the code on a macOS runner.
 2. Run `swift test`.
-3. Import the self-signed certificate (`.p12` and its password, stored as secrets) into a temporary keychain, then run `VERSION=${tag#v} BUILD_NUMBER=$GITHUB_RUN_NUMBER SIMPLETILE_SIGN_IDENTITY="SimpleTile Release" scripts/bundle.sh`.
+3. Import the self-signed certificate (`.p12` and its password, stored as secrets) into a temporary keychain, then run `VERSION=${tag#v} BUILD_NUMBER=$GITHUB_RUN_NUMBER SIMPLETILE_SIGN_IDENTITY="Simple Tile Release" scripts/bundle.sh`.
 4. Zip it and compute the `sha256`.
 5. Create the GitHub release with the zip attached.
 6. Update `Casks/simpletile.rb` in the tap (version and `sha256`) and push. This needs a fine-grained token with write access to the tap repository, stored as a secret.

@@ -12,7 +12,7 @@ Fixed decisions:
 | Repositories | `BlazejNowicki/simpletile` (public), `BlazejNowicki/homebrew-tap` (public) |
 | Bundle identifier | `io.github.blazejnowicki.simpletile` |
 | License | MIT. Permissive, the shortest common license, and what AeroSpace uses. |
-| Signing | Self-signed certificate `SimpleTile Release`, no notarization. See [Distribution](06-distribution.md). |
+| Signing | Self-signed certificate `Simple Tile Release`, no notarization. See [Distribution](06-distribution.md). |
 | Releases | Built and signed in GitHub Actions on a `v*` tag |
 
 ## Step 1: Repository hygiene
@@ -135,16 +135,18 @@ The new bundle identifier resets the local Accessibility permission and login it
 
 ## Step 8: Release certificate
 
+Status: done 2026-11-22. The certificate is named `Simple Tile Release` (with a space); its SHA-1 is `BB7EF8C00D0450A7E390EED4AAF072626E68DA6F`. Both secrets are set.
+
 Who: the user, with Claude guiding.
 
 Changes:
-- Keychain Access → Certificate Assistant → Create a Certificate: name `SimpleTile Release`, identity type Self-Signed Root, certificate type Code Signing, validity 3650 days.
+- Keychain Access → Certificate Assistant → Create a Certificate: name `Simple Tile Release`, identity type Self-Signed Root, certificate type Code Signing, validity 3650 days.
 - Export it with its private key as `SimpleTile-Release.p12`, with a password. Store the file and password in a password manager, not in the repository.
 - `gh secret set SIGNING_CERT_P12 < <(base64 -i SimpleTile-Release.p12)` and `gh secret set SIGNING_CERT_PASSWORD`.
 
 Verify:
-- `security find-identity -p codesigning` lists `SimpleTile Release`.
-- The CI flow works locally: import the `.p12` into a new temporary keychain, sign `build/SimpleTile.app` with it, and `codesign -dv --verbose=2` shows `Authority=SimpleTile Release`. If `codesign` rejects the untrusted certificate, the release workflow needs a trust step; record the fix in `docs/spikes.md`.
+- `security find-identity -p codesigning` lists `Simple Tile Release`.
+- The CI flow works locally: import the `.p12` into a new temporary keychain, sign `build/SimpleTile.app` with it, and `codesign -dv --verbose=2` shows `Authority=Simple Tile Release`. If `codesign` rejects the untrusted certificate, the release workflow needs a trust step; record the fix in `docs/spikes.md`.
 - `gh secret list` shows both secrets.
 
 ## Step 9: Release workflow
@@ -152,12 +154,14 @@ Verify:
 Who: Claude, with the user approving the tag push.
 
 Changes:
-- `.github/workflows/release.yml` on tag `v*`: test, import the certificate into a temporary keychain, `VERSION=${tag#v} BUILD_NUMBER=$GITHUB_RUN_NUMBER SIMPLETILE_SIGN_IDENTITY="SimpleTile Release" scripts/bundle.sh`, `scripts/package.sh`, `gh release create` with the zip.
+- `.github/workflows/release.yml` on tag `v*`: test, import the certificate into a temporary keychain, `VERSION=${tag#v} BUILD_NUMBER=$GITHUB_RUN_NUMBER SIMPLETILE_SIGN_IDENTITY="Simple Tile Release" scripts/bundle.sh`, `scripts/package.sh`, `gh release create` with the zip.
+- A manual run (`gh workflow run release.yml`) builds and signs without publishing, and uploads the zip as an artifact.
 - Tag and push `v0.1.0`.
 
 Verify:
+- A manual run is green, including the `Authority=Simple Tile Release` check.
 - `gh release view v0.1.0` lists `SimpleTile-0.1.0.zip`.
-- The downloaded zip, unpacked: `codesign -dv` shows `Authority=SimpleTile Release`, and `lipo -archs` shows both architectures.
+- The downloaded zip, unpacked: `codesign -dv` shows `Authority=Simple Tile Release`, and `lipo -archs` shows both architectures.
 
 ## Step 10: Tap and cask
 
