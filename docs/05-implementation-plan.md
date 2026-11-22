@@ -182,6 +182,8 @@ Verify:
 
 ## Step 11: Automatic tap update
 
+Status: workflow and deploy key done, dry run green. Tag `v0.1.1` pending the step 10 install check.
+
 Who: Claude.
 
 Changes:
