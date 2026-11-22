@@ -48,7 +48,7 @@ scripts/install.sh          # build, install to ~/Applications, relaunch
 
 Both scripts sign with `$SIMPLETILE_SIGN_IDENTITY` when set, otherwise ad hoc. With ad-hoc signing, macOS asks for the Accessibility permission again after every rebuild.
 
-Design documents are in [`docs/`](docs/README.md).
+Design documents are in [`docs/`](docs/).
 
 ## License
 

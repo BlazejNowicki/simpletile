@@ -77,7 +77,7 @@ final class WindowSystem {
         AXUIElementPerformAction(window, kAXRaiseAction as CFString)
         // Since macOS 14 activation is cooperative: a request from an inactive app is ignored, so we
         // activate ourselves and hand activation over. AXFrontmost would work but raises every window
-        // of the app, like a Dock click. See docs/spikes.md.
+        // of the app, like a Dock click. Measurements in docs/03-architecture.md.
         NSApp.activate()
         NSApp.yieldActivation(to: target)
         target.activate(from: .current, options: [])

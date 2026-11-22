@@ -1,7 +1,5 @@
 # 3. Architecture and design
 
-How the app is structured to meet [Functionality](01-functionality.md) with the [Technology stack](02-technology-stack.md).
-
 ## Core idea: pure decisions, thin shell
 
 Decisions that don't need macOS live in `SimpleTileCore` and are tested there: which keys trigger what, where a tiled window goes, switcher selection and ordering. The `SimpleTile` executable is the shell: it reads the world through AX, feeds the core, and applies the results. There is no central engine. The app delegate routes actions, and the switcher controller calls the core pieces directly.
@@ -95,7 +93,7 @@ Frame changes (`setFrame`):
 - Size, then position, then size again. Some apps clamp size to the screen the window is currently on (TIL-4).
 
 Focus (`focus(_:)`):
-- Set `AXMain` on the window and perform `kAXRaiseAction`. Then hand activation over cooperatively: `NSApp.activate()`, `NSApp.yieldActivation(to:)`, `target.activate(from: .current)`. A plain `activate()` from our inactive app is ignored, and `AXFrontmost` raises every window of the app. Measured in [spikes](spikes.md).
+- Set `AXMain` on the window and perform `kAXRaiseAction`. Then hand activation over cooperatively: `NSApp.activate()`, `NSApp.yieldActivation(to:)`, `target.activate(from: .current)`. Measured on macOS 27.2, six runs each, focusing one window of an app whose other window sits under a third app: a plain `activate()` from our inactive app was ignored every time, `AXFrontmost` activated the app but raised all of its windows every time, and the cooperative handover activated it with only the chosen window raised every time.
 
 ### FocusTracker
 
@@ -140,32 +138,3 @@ The matcher is owned by the event tap thread. Nothing else is shared.
 ## Logging
 
 `os.Logger`, subsystem `simpletile`. Event tap creation and Launch at Login failures are logged at error level. `log stream --predicate 'subsystem == "simpletile"'` shows them.
-
-## Source layout
-
-```
-Package.swift
-Resources/Info.plist
-Sources/
-  SimpleTileCore/   Geometry, InputMatcher, Switcher (WindowID, SwitcherState, FocusHistory)
-  SimpleTile/       main, AppDelegate, SwitcherController, StatusMenu, SwitcherPanel, EventTap, WindowSystem, FocusTracker, AXElement
-Tests/
-  SimpleTileCoreTests/
-scripts/
-  bundle.sh
-  install.sh
-docs/
-```
-
-## Lessons from AeroSpace
-
-Read from the AeroSpace source at commit `6ed6af6` (2026-11-13). AeroSpace is MIT licensed. We reuse ideas, not code.
-
-| What AeroSpace does | Where | Adopted |
-|---|---|---|
-| Turns off `AXEnhancedUserInterface` during moves to stop app animations | `MacApp.disableAnimations` | Yes |
-| Focus: set `AXMain`, raise, then activate the app | `MacApp.nativeFocus` | Yes, with cooperative activation |
-| Size, then position, then size | `MacApp.setFrame` | Yes |
-| Ignores itself | `MacApp.getOrRegister` | Yes |
-| One thread with a run loop per app for all AX calls | `tree/MacApp.swift` | No. A short timeout on the main thread is enough for tiling and the switcher. |
-| `_AXUIElementGetWindow` for stable window IDs | `PrivateApi` | No, against our public-API principle |
