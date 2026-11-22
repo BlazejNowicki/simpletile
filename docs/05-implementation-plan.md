@@ -151,6 +151,8 @@ Verify:
 
 ## Step 9: Release workflow
 
+Status: done 2026-11-22. `v0.1.0` released, signed by `Simple Tile Release`, both architectures.
+
 Who: Claude, with the user approving the tag push.
 
 Changes:
@@ -164,6 +166,8 @@ Verify:
 - The downloaded zip, unpacked: `codesign -dv` shows `Authority=Simple Tile Release`, and `lipo -archs` shows both architectures.
 
 ## Step 10: Tap and cask
+
+Status: tap created, `brew audit --online --strict` and `brew style` pass. Install check on a machine pending.
 
 Who: Claude, with the user approving the repository creation.
 

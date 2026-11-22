@@ -74,14 +74,14 @@ cask "simpletile" do
     strategy :github_latest
   end
 
-  depends_on macos: ">= :sonoma"
+  depends_on macos: :sonoma
+
+  app "SimpleTile.app"
 
   # The app is self-signed, not notarized: without this, Gatekeeper blocks the first launch.
   postflight_steps do
     run "/usr/bin/xattr", args: ["-d", "com.apple.quarantine", "{{appdir}}/SimpleTile.app"], must_succeed: false
   end
-
-  app "SimpleTile.app"
 
   uninstall quit: "io.github.blazejnowicki.simpletile"
 end
