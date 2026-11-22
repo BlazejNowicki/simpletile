@@ -42,15 +42,6 @@ Tiling acts on the focused window, inside the usable area of the display that ho
 - APP-3: On launch without Accessibility permission, the app shows the system permission prompt, and the menu shows "Waiting for Accessibility permission". It starts working as soon as permission is granted, with no restart.
 - APP-4: Only one instance runs. A second launch, for example a manual launch on top of the login item, quits immediately.
 
-## Out of scope for this version
-
-- Workspaces, virtual or native. Users are expected to use macOS Spaces as they are.
-- Configuration file and remapping shortcuts.
-- Automatic tiling, tree or column layouts, gaps.
-- Thirds, quarters, or cycling sizes on repeated presses.
-- Window thumbnails in the switcher.
-- Windows on other Spaces in the switcher.
-
 ## Known limitations
 
 - The switcher only lists windows that the Accessibility API reports for the current Space.
