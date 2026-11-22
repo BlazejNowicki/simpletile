@@ -167,7 +167,7 @@ Verify:
 
 ## Step 10: Tap and cask
 
-Status: tap created, `brew audit --online --strict` and `brew style` pass. Install check on a machine pending.
+Status: done 2026-11-22. `brew audit --online --strict` and `brew style` pass; installed with brew, no quarantine attribute, no Gatekeeper prompt, shortcuts work.
 
 Who: Claude, with the user approving the repository creation.
 
