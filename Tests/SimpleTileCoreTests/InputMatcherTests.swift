@@ -77,7 +77,8 @@ struct SwitcherInputTests {
     func arrows() {
         var matcher = InputMatcher()
         _ = matcher.handle(down(KeyCode.tab, .option))
-        #expect(matcher.handle(down(KeyCode.leftArrow, .option)) == .init(actions: [.switcher(.previous)], swallow: true))
+        #expect(
+            matcher.handle(down(KeyCode.leftArrow, .option)) == .init(actions: [.switcher(.previous)], swallow: true))
         #expect(matcher.handle(up(KeyCode.leftArrow, .option)).swallow)
         #expect(matcher.handle(down(KeyCode.rightArrow, .option)) == .init(actions: [.switcher(.next)], swallow: true))
         #expect(matcher.handle(up(KeyCode.rightArrow, .option)).swallow)

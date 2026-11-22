@@ -90,7 +90,8 @@ private final class SwitcherTile: NSView {
 
         let iconSize: CGFloat = 64
         let icon = NSImageView(
-            frame: NSRect(x: (frame.width - iconSize) / 2, y: frame.height - 8 - iconSize, width: iconSize, height: iconSize))
+            frame: NSRect(
+                x: (frame.width - iconSize) / 2, y: frame.height - 8 - iconSize, width: iconSize, height: iconSize))
         icon.image = item.icon
         icon.imageScaling = .scaleProportionallyUpOrDown
         addSubview(icon)

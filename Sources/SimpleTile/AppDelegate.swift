@@ -15,7 +15,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let panel = SwitcherPanel()
     private var tap: EventTap?
     private var statusItem: NSStatusItem?
-    private let permissionItem = NSMenuItem(title: "Waiting for Accessibility permission", action: nil, keyEquivalent: "")
+    private let permissionItem = NSMenuItem(
+        title: "Waiting for Accessibility permission", action: nil, keyEquivalent: "")
     private let launchAtLoginItem = NSMenuItem(title: "Launch at Login", action: nil, keyEquivalent: "")
     private var permissionTimer: Timer?
 
