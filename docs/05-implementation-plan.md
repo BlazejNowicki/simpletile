@@ -66,6 +66,8 @@ Verify:
 
 ## Step 4: Split `AppDelegate`
 
+Status: code done 2026-11-22. Manual check on the installed app pending.
+
 Who: Claude. Behaviour is unchanged, so no requirement or test changes.
 
 Changes:

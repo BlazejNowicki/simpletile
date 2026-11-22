@@ -4,7 +4,7 @@ How the app is structured to meet [Functionality](01-functionality.md) with the 
 
 ## Core idea: pure decisions, thin shell
 
-Decisions that don't need macOS live in `SimpleTileCore` and are tested there: which keys trigger what, where a tiled window goes, switcher selection and ordering. The `SimpleTile` executable is the shell: it reads the world through AX, feeds the core, and applies the results. There is no central engine. The app delegate calls the core pieces directly.
+Decisions that don't need macOS live in `SimpleTileCore` and are tested there: which keys trigger what, where a tiled window goes, switcher selection and ordering. The `SimpleTile` executable is the shell: it reads the world through AX, feeds the core, and applies the results. There is no central engine. The app delegate routes actions, and the switcher controller calls the core pieces directly.
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,8 @@ flowchart LR
         App[AppDelegate]
         WS[WindowSystem]
         FT[FocusTracker]
-        UI[SwitcherPanel, status item]
+        SC[SwitcherController]
+        UI[SwitcherPanel, StatusMenu]
     end
     subgraph Core["SimpleTileCore (pure)"]
         IM[InputMatcher]
@@ -24,8 +25,11 @@ flowchart LR
     Tap -- KeyEvent --> IM
     IM -- InputAction --> App
     App --> WS
-    App --> SW
+    App --> SC
     App --> UI
+    SC --> SW
+    SC --> WS
+    SC --> UI
     FT --> FH
     WS --> GEO
 ```
@@ -108,10 +112,17 @@ Feeds `FocusHistory`:
 
 ### AppDelegate
 
-- Lifecycle: quits if another instance with the same bundle identifier runs (APP-4). Sets up the status item, then checks `AXIsProcessTrustedWithOptions` with the prompt option. If not trusted, shows the waiting item and polls every second until trusted (APP-3). macOS has no public notification for this. Once trusted, starts `FocusTracker` and `EventTap`.
-- Tiling: forwards `tile` actions to `WindowSystem`.
-- Switcher: on `open`, enumerates windows, orders them by `FocusHistory`, and creates `SwitcherState`. The panel is shown after 100 ms, only if the same switcher session is still open, so a quick ⌥Tab never flashes it. On `commit`, focuses the selection.
-- Status item: SF Symbol `rectangle.split.2x1`. Launch at Login uses `SMAppService.mainApp`. Its state is read each time the menu opens, since it can also change in System Settings. If registration needs approval, the Login Items pane opens. Errors show an alert.
+- Quits if another instance with the same bundle identifier runs (APP-4).
+- Creates the `StatusMenu`, then checks `AXIsProcessTrustedWithOptions` with the prompt option. If not trusted, shows the waiting item and polls every second until trusted (APP-3). macOS has no public notification for this. Once trusted, starts `FocusTracker` and `EventTap`.
+- Routes actions: `tile` to `WindowSystem`, `switcher` to `SwitcherController`.
+
+### SwitcherController
+
+On `open`, enumerates windows, orders them by `FocusHistory`, and creates `SwitcherState`. The panel is shown after 100 ms, only if the same switcher session is still open, so a quick ⌥Tab never flashes it. `next` and `previous` move the highlight. On `commit`, focuses the selection and records it in the history.
+
+### StatusMenu
+
+Status item with the SF Symbol `rectangle.split.2x1`, and the menu from APP-2 plus the waiting item from APP-3. Launch at Login uses `SMAppService.mainApp`. Its state is read each time the menu opens, since it can also change in System Settings. If registration needs approval, the Login Items pane opens. Errors show an alert.
 
 ### SwitcherPanel
 
@@ -121,7 +132,7 @@ Borderless `NSPanel` with `.nonactivatingPanel`, level `.popUpMenu`, `collection
 
 | Thread | Runs | Talks to |
 |---|---|---|
-| Main actor | AppDelegate, WindowSystem, FocusTracker, AX observers, UI | Everything |
+| Main actor | AppDelegate, SwitcherController, WindowSystem, FocusTracker, AX observers, UI | Everything |
 | Event tap thread | `CGEventTap`, `InputMatcher` | Main actor (actions, asynchronously) |
 
 The matcher is owned by the event tap thread. Nothing else is shared.
@@ -137,7 +148,7 @@ Package.swift
 Resources/Info.plist
 Sources/
   SimpleTileCore/   Geometry, InputMatcher, Switcher (WindowID, SwitcherState, FocusHistory)
-  SimpleTile/       main, AppDelegate, EventTap, WindowSystem, FocusTracker, SwitcherPanel, AXElement
+  SimpleTile/       main, AppDelegate, SwitcherController, StatusMenu, SwitcherPanel, EventTap, WindowSystem, FocusTracker, AXElement
 Tests/
   SimpleTileCoreTests/
 scripts/
