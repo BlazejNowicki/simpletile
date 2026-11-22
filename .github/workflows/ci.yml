@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+      - run: swift --version
+      - run: swift build
+      - run: swift test --enable-code-coverage
+      - run: scripts/check-coverage.sh 90
+      - run: scripts/check-traceability.sh
+      - run: swift format lint --strict --recursive Sources Tests Package.swift
+      - name: Bundle, signed ad hoc
+        run: scripts/bundle.sh
