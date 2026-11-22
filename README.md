@@ -1,4 +1,6 @@
-# SimpleTile <img src="Resources/AppIcon.png" width="40%" align="right">
+<p align="center"><img src="Resources/AppIcon.png" width="180" alt="SimpleTile icon"></p>
+
+# SimpleTile
 
 A small keyboard-driven window manager for macOS. It snaps windows to halves or full screen, and ⌥Tab switches between individual windows instead of apps.
 
