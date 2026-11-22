@@ -50,6 +50,8 @@ Verify:
 
 ## Step 3: Formatting and traceability
 
+Status: done 2026-11-22, awaiting review.
+
 Who: Claude.
 
 Changes:
