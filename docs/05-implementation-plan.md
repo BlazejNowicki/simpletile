@@ -182,11 +182,11 @@ Verify:
 
 ## Step 11: Automatic tap update
 
-Who: Claude; the user creates the token.
+Who: Claude.
 
 Changes:
-- The user creates a fine-grained token with contents write access to `BlazejNowicki/homebrew-tap` only, stored as the `TAP_TOKEN` secret.
-- `release.yml`: after the release, run `scripts/cask.sh` and push the cask to the tap.
+- A deploy key with write access to `BlazejNowicki/homebrew-tap` only, its private half stored as the `TAP_DEPLOY_KEY` secret. It never expires, unlike a token.
+- `release.yml`: after the release, run `scripts/cask.sh` and push the cask to the tap. A manual run does `git push --dry-run`, which checks the key's write access without changing the tap.
 - Tag and push `v0.1.1`.
 
 Verify:
